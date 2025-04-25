@@ -1,7 +1,275 @@
 #include <iostream>
+#include <vector>
 #include <iomanip>
 #include <string>
-#include <vector>
+#include <cctype>
 #include <fstream>
-
 using namespace std;
+
+struct CitaMedica {
+    string nombre;
+    int edad = 0;
+    string tel;
+    int SS = 0;
+    string SM;
+    string fecha;
+    string hora;
+    string especialidad;
+    string motivo;
+    string doctor;
+};
+
+const int ANO_ACTUAL = 2025;
+
+// Vectores requeridos por el proyecto
+vector<string> especialidades = { "Cardiologia", "Pediatria", "Dermatologia", "Neurologia" };
+vector<string> diasSemana = { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
+
+void MenuDr() {
+    cout << "1. Ver citas por paciente\n";
+    cout << "2. Ver citas por doctor\n";
+    cout << "3. Calendario\n";
+    cout << "4. Eliminar citas\n";
+    cout << "5. Salir\n";
+}
+
+void MenuPac() {
+    cout << "1. Ver citas\n";
+    cout << "2. Crear citas\n";
+    cout << "3. Cancelar cita\n";
+    cout << "4. Ver calendario\n";
+    cout << "5. Salir\n";
+}
+
+bool login(string& tipoUsuario) {
+    string user, pass;
+    cout << "\nLOGIN\nUsuario: ";
+    cin >> user;
+    cout << "Contraseña: ";
+    cin >> pass;
+
+    if (user == "admin" && pass == "admin123") {
+        tipoUsuario = "doctor";
+        return true;
+    }
+    else {
+        tipoUsuario = "paciente";
+        return true;
+    }
+}
+
+void vercitaspornombre(string nombre) {
+    ifstream archivo("citas.txt");
+    string lineaDtexto;
+    bool nomEncontrado = false;
+
+    if (!archivo) {
+        cout << "Hubo un error al abrir el archivo.\n";
+        return;
+    }
+
+    while (getline(archivo, lineaDtexto)) {
+        if (lineaDtexto.find("Nombre: " + nombre) != string::npos ||
+            lineaDtexto.find("Doctor: " + nombre) != string::npos) {
+            nomEncontrado = true;
+            cout << lineaDtexto << endl;
+            while (getline(archivo, lineaDtexto) && lineaDtexto != "------------------------") {
+                cout << lineaDtexto << endl;
+            }
+            cout << "------------------------" << endl;
+        }
+    }
+
+    if (!nomEncontrado) {
+        cout << "No se encontraron citas para " << nombre << endl;
+    }
+}
+
+void Calendario(int mes, int diasDelMes, int primerDiaMes, string nombreDmes) {
+    cout << "\n[ " << nombreDmes << " " << ANO_ACTUAL << " ]" << endl;
+    cout << "---------------------------------------" << endl;
+    for (const string& dia : diasSemana) {
+        cout << "| " << dia[0] << "  ";
+    }
+    cout << "|" << endl;
+    cout << "---------------------------------------" << endl;
+
+    int dia = 1;
+    for (int i = 0; i < primerDiaMes; ++i) cout << "|    ";
+
+    while (dia <= diasDelMes) {
+        for (int i = primerDiaMes; i < 7 && dia <= diasDelMes; ++i) {
+            cout << "| " << setw(2) << dia << " ";
+            dia++;
+        }
+        cout << "|" << endl;
+        cout << "---------------------------------------" << endl;
+        primerDiaMes = 0;
+    }
+}
+
+void crearCitaNueva() {
+    CitaMedica cita;
+    ofstream archivo("citas.txt", ios::app);
+
+    if (!archivo) {
+        cout << "Error al abrir el archivo." << endl;
+        return;
+    }
+
+    cin.ignore();
+    cout << "Nombre del paciente: ";
+    getline(cin, cita.nombre);
+    cout << "Entre su edad: ";
+    while (!(cin >> cita.edad)) {
+        cout << "Edad inválida. Intente de nuevo: ";
+        cin.clear(); cin.ignore(1000, '\n');
+    }
+    cin.ignore();
+    cout << "Entre su número de teléfono: ";
+    getline(cin, cita.tel);
+    cout << "Entre los últimos 4 dígitos del Seguro Social: ";
+    while (!(cin >> cita.SS)) {
+        cout << "Entrada inválida. Intente de nuevo: ";
+        cin.clear(); cin.ignore(1000, '\n');
+    }
+    cin.ignore();
+
+    char tieneSM;
+    cout << "¿Tiene seguro médico? (s/n): ";
+    cin >> tieneSM; cin.ignore();
+    tieneSM = tolower(tieneSM);
+    if (tieneSM == 's') {
+        cout << "Ingrese su seguro médico: ";
+        getline(cin, cita.SM);
+    }
+    else {
+        cita.SM = "El paciente no tiene seguro medico";
+    }
+
+    cout << "Fecha de la cita (YYYY/MM/DD): ";
+    getline(cin, cita.fecha);
+    cout << "Hora: ";
+    getline(cin, cita.hora);
+
+    cout << "Especialidad (seleccione una): \n";
+    for (int i = 0; i < especialidades.size(); i++)
+        cout << i + 1 << ". " << especialidades[i] << endl;
+    int opt;
+    cin >> opt; cin.ignore();
+    cita.especialidad = (opt >= 1 && opt <= especialidades.size()) ? especialidades[opt - 1] : "General";
+
+    cout << "Motivo: ";
+    getline(cin, cita.motivo);
+    cout << "Nombre del doctor: ";
+    getline(cin, cita.doctor);
+
+    archivo << "Nombre: " << cita.nombre << endl;
+    archivo << "Edad: " << cita.edad << endl;
+    archivo << "Teléfono: " << cita.tel << endl;
+    archivo << "SS (últimos 4): " << cita.SS << endl;
+    archivo << "Seguro Médico: " << cita.SM << endl;
+    archivo << "Fecha: " << cita.fecha << endl;
+    archivo << "Hora: " << cita.hora << endl;
+    archivo << "Especialidad: " << cita.especialidad << endl;
+    archivo << "Motivo: " << cita.motivo << endl;
+    archivo << "Doctor: " << cita.doctor << endl;
+    archivo << "------------------------" << endl;
+    archivo.close();
+
+    cout << "\nCita guardada correctamente." << endl;
+}
+
+void erradicarCita(string nombre) {
+    ifstream archivo("citas.txt");
+    ofstream archivoTmp("copia.txt");
+    string linea;
+    bool encontrado = false;
+
+    if (!archivo || !archivoTmp) {
+        cout << "Error al abrir archivos." << endl;
+        return;
+    }
+
+    while (getline(archivo, linea)) {
+        if (linea.find("Nombre: " + nombre) != string::npos) {
+            encontrado = true;
+            while (linea != "------------------------" && getline(archivo, linea)) {}
+        }
+        else {
+            archivoTmp << linea << endl;
+        }
+    }
+
+    archivo.close();
+    archivoTmp.close();
+    remove("citas.txt");
+    if (rename("copia.txt", "citas.txt") != 0) {
+        cout << "Error al renombrar el archivo." << endl;
+    }
+    cout << (encontrado ? "Cita eliminada.\n" : "No se encontró cita.\n");
+}
+
+int main() {
+    string tipoUsuario;
+    if (!login(tipoUsuario)) {
+        cout << "Error en login." << endl;
+        return 1;
+    }
+
+    int opcion;
+    string mes, nombre;
+
+    if (tipoUsuario == "doctor") {
+        do {
+            MenuDr();
+            cout << "Opción: ";
+            cin >> opcion; cin.ignore();
+            if (opcion == 1) {
+                cout << "Nombre del paciente: "; getline(cin, nombre);
+                vercitaspornombre(nombre);
+            }
+            else if (opcion == 2) {
+                cout << "Nombre del doctor: "; getline(cin, nombre);
+                vercitaspornombre(nombre);
+            }
+            else if (opcion == 3) {
+                cout << "Mes: "; cin >> mes;
+                if (mes == "abril") Calendario(4, 30, 2, mes);
+                else if (mes == "mayo") Calendario(5, 31, 4, mes);
+                else if (mes == "junio") Calendario(6, 30, 0, mes);
+                else cout << "Mes no válido." << endl;
+            }
+            else if (opcion == 4) {
+                cout << "Nombre del paciente: "; getline(cin, nombre);
+                erradicarCita(nombre);
+            }
+        } while (opcion != 5);
+    }
+    else {
+        do {
+            MenuPac();
+            cout << "Opción: ";
+            cin >> opcion; cin.ignore();
+            if (opcion == 1) {
+                cout << "Nombre del paciente: "; getline(cin, nombre);
+                vercitaspornombre(nombre);
+            }
+            else if (opcion == 2) {
+                crearCitaNueva();
+            }
+            else if (opcion == 3) {
+                cout << "Nombre del paciente: "; getline(cin, nombre);
+                erradicarCita(nombre);
+            }
+            else if (opcion == 4) {
+                cout << "Mes: "; cin >> mes;
+                if (mes == "abril") Calendario(4, 30, 2, mes);
+                else if (mes == "mayo") Calendario(5, 31, 4, mes);
+                else if (mes == "junio") Calendario(6, 30, 0, mes);
+                else cout << "Mes no válido." << endl;
+            }
+        } while (opcion != 5);
+    }
+    return 0;
+}
