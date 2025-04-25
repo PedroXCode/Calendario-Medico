@@ -19,7 +19,7 @@ Este proyecto es una agenda médica simple de consola, desarrollada en C++. Perm
   - Crear nueva cita
   - Cancelar cita
   - Ver calendario
-- **Calendario mensual** (Abril, Mayo y Junio incluidos)
+- **Calendario mensual** (Abril a Diciembre)
 - **Gestión de archivos**: Citas guardadas en `citas.txt`
 - **Uso de vectores y estructuras en C++**
 
