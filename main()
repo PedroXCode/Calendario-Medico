@@ -1,3 +1,12 @@
+// =============================
+// Agenda Médica con Login (C++)
+// =============================
+// Este programa permite a doctores y pacientes:
+// - Iniciar sesión como 'admin' o como usuario regular
+// - Crear, ver, eliminar citas médicas
+// - Ver un calendario con resaltado de fechas
+// - Usar vectores y archivos de texto
+
 #include <iostream>
 #include <vector>
 #include <iomanip>
@@ -6,6 +15,7 @@
 #include <fstream>
 using namespace std;
 
+// Estructura para almacenar los datos de cada cita médica
 struct CitaMedica {
     string nombre;
     int edad = 0;
@@ -19,12 +29,14 @@ struct CitaMedica {
     string doctor;
 };
 
+// Año constante del sistema
 const int ANO_ACTUAL = 2025;
 
-// Vectores requeridos por el proyecto
+// Vectores para mostrar especialidades y los días de la semana
 vector<string> especialidades = { "Cardiologia", "Pediatria", "Dermatologia", "Neurologia" };
 vector<string> diasSemana = { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
 
+// Menú para doctores
 void MenuDr() {
     cout << "1. Ver citas por paciente\n";
     cout << "2. Ver citas por doctor\n";
@@ -33,6 +45,7 @@ void MenuDr() {
     cout << "5. Salir\n";
 }
 
+// Menú para pacientes
 void MenuPac() {
     cout << "1. Ver citas\n";
     cout << "2. Crear citas\n";
@@ -41,6 +54,7 @@ void MenuPac() {
     cout << "5. Salir\n";
 }
 
+// Función de login: define si el usuario es doctor o paciente
 bool login(string& tipoUsuario) {
     string user, pass;
     cout << "\nLOGIN\nUsuario: ";
@@ -58,6 +72,7 @@ bool login(string& tipoUsuario) {
     }
 }
 
+// Buscar y mostrar citas según nombre del paciente o doctor
 void vercitaspornombre(string nombre) {
     ifstream archivo("citas.txt");
     string lineaDtexto;
@@ -85,7 +100,8 @@ void vercitaspornombre(string nombre) {
     }
 }
 
-void Calendario(int mes, int diasDelMes, int primerDiaMes, string nombreDmes) {
+// Mostrar calendario con opción de resaltar un día en rojo
+void Calendario(int mes, int diasDelMes, int primerDiaMes, string nombreDmes, int diaCita = -1) {
     cout << "\n[ " << nombreDmes << " " << ANO_ACTUAL << " ]" << endl;
     cout << "---------------------------------------" << endl;
     for (const string& dia : diasSemana) {
@@ -99,7 +115,10 @@ void Calendario(int mes, int diasDelMes, int primerDiaMes, string nombreDmes) {
 
     while (dia <= diasDelMes) {
         for (int i = primerDiaMes; i < 7 && dia <= diasDelMes; ++i) {
-            cout << "| " << setw(2) << dia << " ";
+            if (dia == diaCita)
+                cout << "| \033[31m" << setw(2) << dia << "\033[0m "; // Día resaltado en rojo
+            else
+                cout << "| " << setw(2) << dia << " ";
             dia++;
         }
         cout << "|" << endl;
@@ -108,6 +127,7 @@ void Calendario(int mes, int diasDelMes, int primerDiaMes, string nombreDmes) {
     }
 }
 
+// Crear una nueva cita médica, guardarla en archivo y mostrar calendario
 void crearCitaNueva() {
     CitaMedica cita;
     ofstream archivo("citas.txt", ios::app);
@@ -149,6 +169,9 @@ void crearCitaNueva() {
 
     cout << "Fecha de la cita (YYYY/MM/DD): ";
     getline(cin, cita.fecha);
+    int mesCita = stoi(cita.fecha.substr(5, 2));
+    int diaCita = stoi(cita.fecha.substr(8, 2));
+
     cout << "Hora: ";
     getline(cin, cita.hora);
 
@@ -164,6 +187,7 @@ void crearCitaNueva() {
     cout << "Nombre del doctor: ";
     getline(cin, cita.doctor);
 
+    // Guardar cita en archivo
     archivo << "Nombre: " << cita.nombre << endl;
     archivo << "Edad: " << cita.edad << endl;
     archivo << "Teléfono: " << cita.tel << endl;
@@ -178,8 +202,14 @@ void crearCitaNueva() {
     archivo.close();
 
     cout << "\nCita guardada correctamente." << endl;
+
+    // Mostrar calendario con día resaltado
+    if (mesCita == 4) Calendario(4, 30, 2, "abril", diaCita);
+    else if (mesCita == 5) Calendario(5, 31, 4, "mayo", diaCita);
+    else if (mesCita == 6) Calendario(6, 30, 0, "junio", diaCita);
 }
 
+// Eliminar cita médica por nombre
 void erradicarCita(string nombre) {
     ifstream archivo("citas.txt");
     ofstream archivoTmp("copia.txt");
@@ -210,6 +240,7 @@ void erradicarCita(string nombre) {
     cout << (encontrado ? "Cita eliminada.\n" : "No se encontró cita.\n");
 }
 
+// Función principal con menú de navegación para doctor o paciente
 int main() {
     string tipoUsuario;
     if (!login(tipoUsuario)) {
