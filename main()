@@ -66,9 +66,13 @@ bool login(string& tipoUsuario) {
         tipoUsuario = "doctor";
         return true;
     }
-    else {
+    else if (user == "paciente" && pass == "paciente123") {
         tipoUsuario = "paciente";
         return true;
+    }
+    else {
+        cout << "Credenciales incorrectas.\n";
+        return false;
     }
 }
 
@@ -243,10 +247,11 @@ void erradicarCita(string nombre) {
 // Función principal con menú de navegación para doctor o paciente
 int main() {
     string tipoUsuario;
-    if (!login(tipoUsuario)) {
-        cout << "Error en login." << endl;
-        return 1;
+
+    while (!login(tipoUsuario)) {
+        cout << "Credenciales incorrectas. Intenta de nuevo.\n";
     }
+
 
     int opcion;
     string mes, nombre;
