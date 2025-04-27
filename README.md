@@ -35,20 +35,9 @@ Este proyecto es una agenda médica simple de consola, desarrollada en C++. Perm
 4. Sigue las opciones del menú para gestionar citas.
 5. El archivo `citas.txt` se creará automáticamente para guardar la información.
 
-### 💻 Compilación rápida
-
-```bash
-g++ -o mediScheduler mediScheduler.cpp
-./mediScheduler
-```
-
----
 
 ## 📜 Version History
 
 - **v1.0 (Abril 2025)**
   - Versión inicial del proyecto.
   - Funcionalidades básicas de login, gestión de citas, calendario y almacenamiento de datos.
-  - Correcciones de warnings (inicialización de miembros, validación de `rename()`).
-
----
