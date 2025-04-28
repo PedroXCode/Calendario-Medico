@@ -1,4 +1,4 @@
-# 🩺 MediScheduler (Agenda Médica en C++)
+# 🩺 MediScheduler (C++)
 
 Este proyecto es una agenda médica simple de consola, desarrollada en C++. Permite que médicos y pacientes gestionen citas médicas, eliminen citas y vean un calendario.
 
@@ -19,7 +19,7 @@ Este proyecto es una agenda médica simple de consola, desarrollada en C++. Perm
   - Crear nueva cita
   - Cancelar cita
   - Ver calendario
-- **Calendario mensual** (Abril a Diciembre)
+- **Calendario mensual** (Abril a Junio)
 - **Gestión de archivos**: Citas guardadas en `citas.txt`
 - **Uso de vectores y estructuras en C++**
 
@@ -30,8 +30,8 @@ Este proyecto es una agenda médica simple de consola, desarrollada en C++. Perm
 1. Compila el programa en C++.
 2. Ejecuta el archivo generado.
 3. En el login:
-   - Escribe `admin` y `admin123` para entrar como **doctor**.
-   - Escribe cualquier otro usuario y contraseña para entrar como **paciente**.
+   - Escribe `Admin` y `admin123` para entrar como **doctor**.
+   - Escribe `Paciente` y `paciente123` para entrar como **paciente**.
 4. Sigue las opciones del menú para gestionar citas.
 5. El archivo `citas.txt` se creará automáticamente para guardar la información.
 
